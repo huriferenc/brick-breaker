@@ -85,6 +85,11 @@ function handleLose() {
 function handleHit(elemIndex) {
   if (removeBrick(elemIndex)) {
     scoreElem.textContent = Number.parseInt(scoreElem.textContent) + 1;
+
+    if (bricks.length === 0) {
+      ball.reset();
+      generateBricks();
+    }
   }
 }
 
@@ -122,10 +127,6 @@ function removeBrick(index) {
     brick.remove();
     bricks.splice(index, 1);
     brickRects.splice(index, 1);
-
-    if (bricks.length === 0) {
-      generateBricks();
-    }
 
     return true;
   }
@@ -167,16 +168,14 @@ else {
   });
 
   document.addEventListener('keydown', (e) => {
-    console.log(e);
+    const btnDelta = 6;
+
     switch (e.key) {
       case 'ArrowLeft':
-        // moveFn((e.) * 100);
+        moveFn(paddle.position - btnDelta);
         break;
       case 'ArrowRight':
-        break;
-      case 'ArrowUp':
-        break;
-      case 'ArrowDown':
+        moveFn(paddle.position + btnDelta);
         break;
     }
   });
