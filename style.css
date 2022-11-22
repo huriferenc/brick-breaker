@@ -17,6 +17,11 @@
   --backgroundColor: hsl(0, 0%, var(--backgroundLightness));
 }
 
+html,
+body {
+  height: 100%;
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -98,6 +103,13 @@ body {
 
   width: var(--w);
   height: var(--h);
+
+  padding: 3px;
+}
+
+.brick > .brick__content {
+  width: 100%;
+  height: 100%;
   border: 5px solid var(--foregroundColor);
 }
 

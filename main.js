@@ -11,7 +11,8 @@ const scoreElem = document.getElementById('player-score');
 
 const bricksContainer = document.getElementById('bricks');
 
-let bricks = getBricks();
+let bricks = [];
+let brickRects = [];
 
 let lightnessDirection = -1;
 let lastTime;
@@ -21,10 +22,10 @@ function update(time) {
 
     updateGround(delta);
 
-    ball.update(delta, [paddle.rect(), ...bricks], function (hitRectIndex) {
+    ball.update(delta, [paddle.rect(), ...brickRects], function (hitRectIndex) {
       // If hit a brick
       if (hitRectIndex > 0) {
-        handleHit(hitRectIndex);
+        handleHit(hitRectIndex - 1);
       }
     });
 
@@ -77,39 +78,67 @@ function handleLose() {
   scoreElem.textContent = Number.parseInt(scoreElem.textContent) - 1;
 
   ball.reset();
-  // bricks.reset();
+
+  generateBricks();
 }
 
 function handleHit(elemIndex) {
-  const brick = document.getElementById(`brick-${elemIndex}`);
-  if (!!brick) {
-    brick.remove();
-    bricks = getBricks();
+  if (removeBrick(elemIndex)) {
     scoreElem.textContent = Number.parseInt(scoreElem.textContent) + 1;
   }
 }
 
-function getBricks() {
-  return [...document.querySelectorAll('.brick')]?.map((item) => item.getBoundingClientRect());
-}
-
 function generateBricks() {
+  // Clear content of bricks container
+  bricksContainer.replaceChildren();
+
+  bricks = [];
+  brickRects = [];
+
   for (let i = 0; i < MAX_BRICK_COUNT; i++) {
     const brick = document.createElement('div');
     brick.className = 'brick';
     brick.id = `brick-${i + 1}`;
-    // brick.style
+
+    const brickContent = document.createElement('div');
+    brickContent.className = 'brick__content';
+    brick.appendChild(brickContent);
+
     bricksContainer.appendChild(brick);
 
     brick.style.setProperty('--x', i % 10);
     brick.style.setProperty('--y', Math.floor(i / 10));
+
+    bricks.push(brick);
   }
+
+  brickRects = [...bricks]?.map((item) => item.getBoundingClientRect());
+}
+
+function removeBrick(index) {
+  const brick = bricks[index];
+
+  if (!!brick) {
+    brick.remove();
+    bricks.splice(index, 1);
+    brickRects.splice(index, 1);
+
+    if (bricks.length === 0) {
+      generateBricks();
+    }
+
+    return true;
+  }
+
+  return false;
 }
 
 startButton.addEventListener('click', () => {
   console.log('START!');
 
   generateBricks();
+
+  document.documentElement.style.cursor = 'none';
 
   const ballElem = ball.ballElem;
   ballElem.style.display = 'block';
@@ -129,7 +158,26 @@ if ('ontouchmove' in document.documentElement) {
 }
 // Desktop device
 else {
+  function moveFn(value) {
+    paddle.position = value;
+  }
+
   document.addEventListener('mousemove', (e) => {
-    paddle.position = (e.x / window.innerWidth) * 100;
+    moveFn((e.x / window.innerWidth) * 100);
+  });
+
+  document.addEventListener('keydown', (e) => {
+    console.log(e);
+    switch (e.key) {
+      case 'ArrowLeft':
+        // moveFn((e.) * 100);
+        break;
+      case 'ArrowRight':
+        break;
+      case 'ArrowUp':
+        break;
+      case 'ArrowDown':
+        break;
+    }
   });
 }
